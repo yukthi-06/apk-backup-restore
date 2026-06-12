@@ -22,6 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/search_bg"
+            android:theme="@style/SearchViewStyle"
             app:queryHint="Search backups..."
             app:iconifiedByDefault="false" />
 
