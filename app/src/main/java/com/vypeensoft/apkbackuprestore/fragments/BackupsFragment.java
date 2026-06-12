@@ -255,11 +255,30 @@ public class BackupsFragment extends Fragment implements BackupListAdapter.Backu
                 .setMessage("Are you sure you want to permanently delete the backup file: " + backupInfo.getFileName() + "?")
                 .setPositiveButton("Delete", (dialog, which) -> {
                     try {
-                        DocumentFile file = DocumentFile.fromSingleUri(requireContext(), backupInfo.getFileUri());
-                        if (file != null && file.exists()) {
-                            file.delete();
-                            Toast.makeText(getContext(), "Backup deleted.", Toast.LENGTH_SHORT).show();
-                            viewModel.loadBackups();
+                        // Null out icon reference to help garbage collection
+                        backupInfo.setIcon(null);
+                        
+                        // Request garbage collection to release open file descriptors
+                        System.gc();
+                        System.runFinalization();
+                        
+                        File file = new File(backupInfo.getFilePath());
+                        if (file.exists()) {
+                            if (file.delete()) {
+                                Toast.makeText(getContext(), "Backup deleted.", Toast.LENGTH_SHORT).show();
+                                viewModel.loadBackups();
+                            } else {
+                                // Try again with another GC cycle
+                                System.gc();
+                                System.runFinalization();
+                                try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+                                if (file.delete()) {
+                                    Toast.makeText(getContext(), "Backup deleted.", Toast.LENGTH_SHORT).show();
+                                    viewModel.loadBackups();
+                                } else {
+                                    Toast.makeText(getContext(), "Failed to delete backup file.", Toast.LENGTH_SHORT).show();
+                                }
+                            }
                         } else {
                             Toast.makeText(getContext(), "Backup file not found.", Toast.LENGTH_SHORT).show();
                         }
@@ -288,8 +307,6 @@ public class BackupsFragment extends Fragment implements BackupListAdapter.Backu
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Backup Details")
                 .setMessage(details.toString())
-                .setPositiveButton("OK", null)
-                .show();
     }
 
     private void performBatchInstall() {
@@ -360,13 +377,31 @@ public class BackupsFragment extends Fragment implements BackupListAdapter.Backu
                 .setTitle("Delete Selected Backups?")
                 .setMessage("Are you sure you want to permanently delete " + selected.size() + " selected backup files?")
                 .setPositiveButton("Delete", (dialog, which) -> {
+                    // Null out icon references to help garbage collection
+                    for (BackupInfo b : selected) {
+                        b.setIcon(null);
+                    }
+                    
+                    // Request garbage collection to release open file descriptors
+                    System.gc();
+                    System.runFinalization();
+
                     int deletedCount = 0;
                     for (BackupInfo b : selected) {
                         try {
-                            DocumentFile file = DocumentFile.fromSingleUri(requireContext(), b.getFileUri());
-                            if (file != null && file.exists()) {
-                                file.delete();
-                                deletedCount++;
+                            File file = new File(b.getFilePath());
+                            if (file.exists()) {
+                                if (file.delete()) {
+                                    deletedCount++;
+                                } else {
+                                    // Try again with GC
+                                    System.gc();
+                                    System.runFinalization();
+                                    try { Thread.sleep(50); } catch (InterruptedException ignored) {}
+                                    if (file.delete()) {
+                                        deletedCount++;
+                                    }
+                                }
                             }
                         } catch (Exception e) {
                             e.printStackTrace();

@@ -3,6 +3,9 @@ package com.vypeensoft.apkbackuprestore.repositories;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import androidx.core.content.ContextCompat;
@@ -79,7 +82,24 @@ public class BackupRepository {
                 packageInfo.applicationInfo.publicSourceDir = file.getAbsolutePath();
                 
                 String appLabel = packageInfo.applicationInfo.loadLabel(pm).toString();
-                Drawable icon = packageInfo.applicationInfo.loadIcon(pm);
+                Drawable rawIcon = packageInfo.applicationInfo.loadIcon(pm);
+                Drawable icon = null;
+                if (rawIcon != null) {
+                    try {
+                        int width = rawIcon.getIntrinsicWidth();
+                        int height = rawIcon.getIntrinsicHeight();
+                        if (width <= 0) width = 100;
+                        if (height <= 0) height = 100;
+                        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                        Canvas canvas = new Canvas(bitmap);
+                        rawIcon.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+                        rawIcon.draw(canvas);
+                        icon = new BitmapDrawable(context.getResources(), bitmap);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        icon = rawIcon;
+                    }
+                }
 
                 return new BackupInfo(
                         file.getName(),
