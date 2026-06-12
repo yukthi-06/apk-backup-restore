@@ -25,6 +25,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.vypeensoft.apkbackuprestore.R;
 import com.vypeensoft.apkbackuprestore.adapters.AppListAdapter;
 import com.vypeensoft.apkbackuprestore.models.AppInfo;
+import com.vypeensoft.apkbackuprestore.models.AppSettings;
 import com.vypeensoft.apkbackuprestore.utils.ApkBackupManager;
 import com.vypeensoft.apkbackuprestore.viewmodels.InstalledAppsViewModel;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -110,9 +111,8 @@ public class InstalledAppsFragment extends Fragment implements AppListAdapter.Ap
     public void onResume() {
         super.onResume();
         // Automatically check Settings and reload apps
-        android.content.SharedPreferences prefs = requireContext().getSharedPreferences("apk_backup_prefs", android.content.Context.MODE_PRIVATE);
-        boolean showSystem = prefs.getBoolean("show_system_apps", false);
-        viewModel.setShowSystemApps(showSystem);
+        AppSettings settings = AppSettings.load();
+        viewModel.setShowSystemApps(settings.showSystemApps);
         viewModel.loadApps();
     }
 

@@ -6,14 +6,10 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import androidx.core.content.ContextCompat;
-import androidx.documentfile.provider.DocumentFile;
 import com.vypeensoft.apkbackuprestore.R;
+import com.vypeensoft.apkbackuprestore.models.AppSettings;
 import com.vypeensoft.apkbackuprestore.models.BackupInfo;
-import com.vypeensoft.apkbackuprestore.utils.StorageManager;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,12 +25,10 @@ public class BackupRepository {
     }
 
     private final Context context;
-    private final StorageManager storageManager;
     private final ExecutorService executorService;
 
     public BackupRepository(Context context) {
         this.context = context.getApplicationContext();
-        this.storageManager = new StorageManager(context);
         this.executorService = Executors.newSingleThreadExecutor();
     }
 
@@ -42,25 +36,28 @@ public class BackupRepository {
         executorService.execute(() -> {
             callback.onStart();
             List<BackupInfo> backupList = new ArrayList<>();
-            DocumentFile backupFolder = storageManager.getBackupDocumentFolder();
+            AppSettings settings = AppSettings.load();
+            File backupFolder = new File(settings.backupDirPath);
 
-            if (backupFolder != null && backupFolder.exists() && backupFolder.isDirectory()) {
-                DocumentFile[] files = backupFolder.listFiles();
+            if (backupFolder.exists() && backupFolder.isDirectory()) {
+                File[] files = backupFolder.listFiles();
                 PackageManager pm = context.getPackageManager();
 
-                for (DocumentFile docFile : files) {
-                    if (docFile.isFile() && docFile.getName() != null && docFile.getName().endsWith(".apk")) {
-                        
-                        // Perform name filtering if query is present
-                        if (query != null && !query.trim().isEmpty()) {
-                            if (!docFile.getName().toLowerCase().contains(query.toLowerCase())) {
-                                continue;
+                if (files != null) {
+                    for (File file : files) {
+                        if (file.isFile() && file.getName() != null && file.getName().endsWith(".apk")) {
+                            
+                            // Perform name filtering if query is present
+                            if (query != null && !query.trim().isEmpty()) {
+                                if (!file.getName().toLowerCase().contains(query.toLowerCase())) {
+                                    continue;
+                                }
                             }
-                        }
 
-                        BackupInfo info = parseApkMetadata(docFile, pm);
-                        if (info != null) {
-                            backupList.add(info);
+                            BackupInfo info = parseApkMetadata(file, pm);
+                            if (info != null) {
+                                backupList.add(info);
+                            }
                         }
                     }
                 }
@@ -72,62 +69,46 @@ public class BackupRepository {
         });
     }
 
-    private BackupInfo parseApkMetadata(DocumentFile docFile, PackageManager pm) {
-        File tempFile = new File(context.getCacheDir(), "temp_parse_" + System.currentTimeMillis() + ".apk");
+    private BackupInfo parseApkMetadata(File file, PackageManager pm) {
         try {
-            // Copy file to cache for parsing
-            try (InputStream in = context.getContentResolver().openInputStream(docFile.getUri());
-                 OutputStream out = new FileOutputStream(tempFile)) {
-                if (in == null) return null;
-                byte[] buffer = new byte[8192];
-                int read;
-                while ((read = in.read(buffer)) != -1) {
-                    out.write(buffer, 0, read);
-                }
-            }
-
-            // Parse APK
-            PackageInfo packageInfo = pm.getPackageArchiveInfo(tempFile.getAbsolutePath(), 0);
+            // Parse APK directly
+            PackageInfo packageInfo = pm.getPackageArchiveInfo(file.getAbsolutePath(), 0);
             if (packageInfo != null) {
                 // Important to load label/icon correctly
-                packageInfo.applicationInfo.sourceDir = tempFile.getAbsolutePath();
-                packageInfo.applicationInfo.publicSourceDir = tempFile.getAbsolutePath();
+                packageInfo.applicationInfo.sourceDir = file.getAbsolutePath();
+                packageInfo.applicationInfo.publicSourceDir = file.getAbsolutePath();
                 
                 String appLabel = packageInfo.applicationInfo.loadLabel(pm).toString();
                 Drawable icon = packageInfo.applicationInfo.loadIcon(pm);
 
                 return new BackupInfo(
-                        docFile.getName(),
-                        docFile.getUri().getPath(),
-                        docFile.getUri(),
+                        file.getName(),
+                        file.getAbsolutePath(),
+                        Uri.fromFile(file),
                         appLabel,
                         packageInfo.packageName,
                         packageInfo.versionName != null ? packageInfo.versionName : "1.0",
                         packageInfo.versionCode,
-                        docFile.lastModified(),
-                        docFile.length(),
+                        file.lastModified(),
+                        file.length(),
                         icon
                 );
             }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (tempFile.exists()) {
-                tempFile.delete();
-            }
         }
         
         // Return a fallback backup info if parsing fails
         return new BackupInfo(
-                docFile.getName(),
-                docFile.getUri().getPath(),
-                docFile.getUri(),
-                docFile.getName().replace(".apk", ""),
+                file.getName(),
+                file.getAbsolutePath(),
+                Uri.fromFile(file),
+                file.getName().replace(".apk", ""),
                 "unknown.package",
                 "1.0",
                 1,
-                docFile.lastModified(),
-                docFile.length(),
+                file.lastModified(),
+                file.length(),
                 ContextCompat.getDrawable(context, R.drawable.ic_installed_apps)
         );
     }

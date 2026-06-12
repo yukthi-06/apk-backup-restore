@@ -9,20 +9,13 @@ import android.widget.Toast;
 import androidx.core.content.FileProvider;
 import com.vypeensoft.apkbackuprestore.models.BackupInfo;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class ApkRestoreManager {
 
     private final Context context;
-    private final ExecutorService executorService;
 
     public ApkRestoreManager(Context context) {
         this.context = context.getApplicationContext();
-        this.executorService = Executors.newSingleThreadExecutor();
     }
 
     /**
@@ -35,49 +28,29 @@ public class ApkRestoreManager {
         }
 
         listener.onStart();
-        executorService.execute(() -> {
-            try {
-                // To avoid permission denial issues from package installer,
-                // we copy the backup APK into the app's cache folder,
-                // and then serve it via FileProvider.
-                File tempApk = new File(context.getCacheDir(), "install_temp.apk");
-                if (tempApk.exists()) {
-                    tempApk.delete();
-                }
-
-                Uri sourceUri = backupInfo.getFileUri();
-                try (InputStream in = context.getContentResolver().openInputStream(sourceUri);
-                     OutputStream out = new FileOutputStream(tempApk)) {
-                    
-                    if (in == null) {
-                        listener.onError("Cannot read backup APK.");
-                        return;
-                    }
-
-                    byte[] buffer = new byte[8192];
-                    int bytesRead;
-                    while ((bytesRead = in.read(buffer)) != -1) {
-                        out.write(buffer, 0, bytesRead);
-                    }
-                }
-
-                // Get FileProvider URI
-                Uri apkUri = FileProvider.getUriForFile(context, 
-                        "com.vypeensoft.apkbackuprestore.fileprovider", tempApk);
-
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-                context.startActivity(intent);
-                listener.onSuccess();
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                listener.onError("Installation failed: " + e.getMessage());
+        try {
+            File apkFile = new File(backupInfo.getFilePath());
+            if (!apkFile.exists()) {
+                listener.onError("Backup APK file not found at " + apkFile.getAbsolutePath());
+                return;
             }
-        });
+
+            // Get FileProvider URI directly from external storage
+            Uri apkUri = FileProvider.getUriForFile(context, 
+                    "com.vypeensoft.apkbackuprestore.fileprovider", apkFile);
+
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            context.startActivity(intent);
+            listener.onSuccess();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            listener.onError("Installation failed: " + e.getMessage());
+        }
     }
 
     /**

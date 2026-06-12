@@ -35,6 +35,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Check/Request storage permissions on startup
+        if (!PermissionManager.hasStoragePermission(this)) {
+            PermissionManager.requestStoragePermission(this);
+        }
+
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -93,16 +98,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void applySavedNightMode() {
-        SharedPreferences prefs = getSharedPreferences("apk_backup_prefs", Context.MODE_PRIVATE);
-        boolean darkMode = prefs.getBoolean("dark_mode", false);
-        if (darkMode) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        }
-    }
-
     @Override
     public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -120,6 +115,9 @@ public class MainActivity extends AppCompatActivity {
         if (navDrawer != null) {
             navDrawer.setCheckedItem(R.id.nav_main);
         }
-        applySavedNightMode();
+        // Re-check permissions
+        if (!PermissionManager.hasStoragePermission(this)) {
+            PermissionManager.requestStoragePermission(this);
+        }
     }
 }

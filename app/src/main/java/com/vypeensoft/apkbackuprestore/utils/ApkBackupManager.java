@@ -1,11 +1,11 @@
 package com.vypeensoft.apkbackuprestore.utils;
 
 import android.content.Context;
-import android.net.Uri;
-import androidx.documentfile.provider.DocumentFile;
 import com.vypeensoft.apkbackuprestore.models.AppInfo;
+import com.vypeensoft.apkbackuprestore.models.AppSettings;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.ExecutorService;
@@ -21,12 +21,10 @@ public class ApkBackupManager {
     }
 
     private final Context context;
-    private final StorageManager storageManager;
     private final ExecutorService executorService;
 
     public ApkBackupManager(Context context) {
         this.context = context.getApplicationContext();
-        this.storageManager = new StorageManager(context);
         this.executorService = Executors.newSingleThreadExecutor();
     }
 
@@ -44,12 +42,12 @@ public class ApkBackupManager {
      * Checks if backup already exists for this app.
      */
     public boolean isBackupExisting(AppInfo appInfo) {
-        String fileName = getBackupFileName(appInfo);
-        DocumentFile destFolder = storageManager.getBackupDocumentFolder();
-        if (destFolder == null) return false;
+        AppSettings settings = AppSettings.load();
+        File destFolder = new File(settings.backupDirPath);
+        if (!destFolder.exists()) return false;
         
-        DocumentFile existingFile = destFolder.findFile(fileName);
-        return existingFile != null && existingFile.exists();
+        File existingFile = new File(destFolder, getBackupFileName(appInfo));
+        return existingFile.exists();
     }
 
     /**
@@ -59,6 +57,12 @@ public class ApkBackupManager {
         executorService.execute(() -> {
             listener.onStart();
             try {
+                AppSettings settings = AppSettings.load();
+                File destFolder = new File(settings.backupDirPath);
+                if (!destFolder.exists()) {
+                    destFolder.mkdirs();
+                }
+
                 String fileName = getBackupFileName(appInfo);
                 File sourceApk = new File(appInfo.getApkPath());
                 
@@ -67,20 +71,8 @@ public class ApkBackupManager {
                     return;
                 }
 
-                DocumentFile destFolder = storageManager.getBackupDocumentFolder();
-                if (destFolder == null) {
-                    listener.onError("Backup directory unavailable.");
-                    return;
-                }
-
-                // If folder is not writable
-                if (!destFolder.canWrite()) {
-                    listener.onError("Backup directory is read-only. Select another directory in Settings.");
-                    return;
-                }
-
-                DocumentFile destFile = destFolder.findFile(fileName);
-                if (destFile != null && destFile.exists()) {
+                File destFile = new File(destFolder, fileName);
+                if (destFile.exists()) {
                     if (!overwrite) {
                         listener.onError("Backup already exists.");
                         return;
@@ -88,20 +80,9 @@ public class ApkBackupManager {
                     destFile.delete();
                 }
 
-                destFile = destFolder.createFile("application/vnd.android.package-archive", fileName);
-                if (destFile == null) {
-                    listener.onError("Failed to create backup file.");
-                    return;
-                }
-
                 // Copy stream
                 try (InputStream in = new FileInputStream(sourceApk);
-                     OutputStream out = context.getContentResolver().openOutputStream(destFile.getUri())) {
-                    
-                    if (out == null) {
-                        listener.onError("Unable to write backup file stream.");
-                        return;
-                    }
+                     OutputStream out = new FileOutputStream(destFile)) {
 
                     byte[] buffer = new byte[8192];
                     long totalBytes = sourceApk.length();
@@ -123,7 +104,7 @@ public class ApkBackupManager {
                     }
                     
                     listener.onProgress(100);
-                    listener.onSuccess(destFile.getUri().toString());
+                    listener.onSuccess(destFile.getAbsolutePath());
                 }
 
             } catch (Exception e) {
