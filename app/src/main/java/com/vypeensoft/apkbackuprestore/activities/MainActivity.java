@@ -17,6 +17,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.vypeensoft.apkbackuprestore.R;
 import com.vypeensoft.apkbackuprestore.fragments.BackupsFragment;
 import com.vypeensoft.apkbackuprestore.fragments.InstalledAppsFragment;
+import com.vypeensoft.apkbackuprestore.utils.PermissionManager;
 
 public class MainActivity extends AppCompatActivity {
 
