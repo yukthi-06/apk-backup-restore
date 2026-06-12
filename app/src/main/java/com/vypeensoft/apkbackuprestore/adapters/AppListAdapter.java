@@ -124,7 +124,11 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.AppViewH
         public void bind(AppInfo appInfo) {
             imgIcon.setImageDrawable(appInfo.getIcon());
             tvName.setText(appInfo.getAppName());
-            tvVersion.setText("v" + appInfo.getVersionName());
+            String versionName = appInfo.getVersionName();
+            if (versionName != null && versionName.length() > 15) {
+                versionName = versionName.substring(0, 15);
+            }
+            tvVersion.setText("v" + versionName);
             tvSize.setText(Formatter.formatFileSize(context, appInfo.getApkSize()));
 
             if (appInfo.isSystemApp()) {

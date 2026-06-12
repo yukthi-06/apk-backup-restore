@@ -131,7 +131,11 @@ public class BackupListAdapter extends RecyclerView.Adapter<BackupListAdapter.Ba
             }
             
             tvAppName.setText(backupInfo.getAppName());
-            tvVersion.setText("v" + backupInfo.getVersionName());
+            String versionName = backupInfo.getVersionName();
+            if (versionName != null && versionName.length() > 15) {
+                versionName = versionName.substring(0, 15);
+            }
+            tvVersion.setText("v" + versionName);
             tvSize.setText(Formatter.formatFileSize(context, backupInfo.getFileSize()));
             
             String formattedDate = DateFormat.getDateInstance(DateFormat.SHORT).format(new Date(backupInfo.getBackupDate()));
