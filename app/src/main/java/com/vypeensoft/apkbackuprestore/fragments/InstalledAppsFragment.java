@@ -313,14 +313,7 @@ public class InstalledAppsFragment extends Fragment implements AppListAdapter.Ap
     }
 
     private void performBatchBackup() {
-        List<AppInfo> apps = viewModel.getInstalledApps().getValue();
-        if (apps == null) return;
-        List<AppInfo> selected = new ArrayList<>();
-        for (AppInfo app : apps) {
-            if (app.isSelected()) {
-                selected.add(app);
-            }
-        }
+        List<AppInfo> selected = adapter.getSelectedApps();
         if (selected.isEmpty()) {
             Toast.makeText(getContext(), "No applications selected.", Toast.LENGTH_SHORT).show();
             return;
@@ -373,13 +366,10 @@ public class InstalledAppsFragment extends Fragment implements AppListAdapter.Ap
     }
 
     private void performBatchUninstall() {
-        List<AppInfo> apps = viewModel.getInstalledApps().getValue();
-        if (apps == null) return;
+        List<AppInfo> apps = adapter.getSelectedApps();
         List<String> selected = new ArrayList<>();
         for (AppInfo app : apps) {
-            if (app.isSelected()) {
-                selected.add(app.getPackageName());
-            }
+            selected.add(app.getPackageName());
         }
         if (selected.isEmpty()) {
             Toast.makeText(getContext(), "No applications selected.", Toast.LENGTH_SHORT).show();

@@ -293,14 +293,7 @@ public class BackupsFragment extends Fragment implements BackupListAdapter.Backu
     }
 
     private void performBatchInstall() {
-        List<BackupInfo> backups = viewModel.getBackupApps().getValue();
-        if (backups == null) return;
-        List<BackupInfo> selected = new ArrayList<>();
-        for (BackupInfo b : backups) {
-            if (b.isSelected()) {
-                selected.add(b);
-            }
-        }
+        List<BackupInfo> selected = adapter.getSelectedBackups();
         if (selected.isEmpty()) {
             Toast.makeText(getContext(), "No backups selected.", Toast.LENGTH_SHORT).show();
             return;
@@ -356,14 +349,7 @@ public class BackupsFragment extends Fragment implements BackupListAdapter.Backu
     }
 
     private void performBatchDelete() {
-        List<BackupInfo> backups = viewModel.getBackupApps().getValue();
-        if (backups == null) return;
-        List<BackupInfo> selected = new ArrayList<>();
-        for (BackupInfo b : backups) {
-            if (b.isSelected()) {
-                selected.add(b);
-            }
-        }
+        List<BackupInfo> selected = adapter.getSelectedBackups();
         if (selected.isEmpty()) {
             Toast.makeText(getContext(), "No backups selected.", Toast.LENGTH_SHORT).show();
             return;

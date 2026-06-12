@@ -61,6 +61,16 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.AppViewH
         diffResult.dispatchUpdatesTo(this);
     }
 
+    public List<AppInfo> getSelectedApps() {
+        List<AppInfo> selected = new ArrayList<>();
+        for (AppInfo app : appList) {
+            if (app.isSelected()) {
+                selected.add(app);
+            }
+        }
+        return selected;
+    }
+
     @NonNull
     @Override
     public AppViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

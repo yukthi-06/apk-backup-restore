@@ -63,6 +63,16 @@ public class BackupListAdapter extends RecyclerView.Adapter<BackupListAdapter.Ba
         diffResult.dispatchUpdatesTo(this);
     }
 
+    public List<BackupInfo> getSelectedBackups() {
+        List<BackupInfo> selected = new ArrayList<>();
+        for (BackupInfo b : backupList) {
+            if (b.isSelected()) {
+                selected.add(b);
+            }
+        }
+        return selected;
+    }
+
     @NonNull
     @Override
     public BackupViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
