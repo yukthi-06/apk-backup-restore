@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Expose external files directory (default backup location) -->
+    <external-files-path name="default_backups" path="Backups" />
+    <external-files-path name="external_files" path="." />
+    <!-- Expose whole external storage for legacy purposes -->
+    <external-path name="external_storage" path="." />
+    <!-- Cache path for temporary sharing -->
+    <cache-path name="cache" path="." />
+</paths>

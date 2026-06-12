@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navigation_installed"
+        android:icon="@drawable/ic_installed_apps"
+        android:title="Installed Apps" />
+
+    <item
+        android:id="@+id/navigation_backups"
+        android:icon="@drawable/ic_backup"
+        android:title="Backups" />
+
+    <item
+        android:id="@+id/navigation_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="Settings" />
+</menu>

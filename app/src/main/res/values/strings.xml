@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">APK Backup &amp; Restore</string>
+    <string name="title_installed">Installed Apps</string>
+    <string name="title_backups">Backups</string>
+    <string name="title_settings">Settings</string>
+    
+    <!-- Installed Apps Actions -->
+    <string name="action_backup">Backup</string>
+    <string name="action_share">Share</string>
+    <string name="action_uninstall">Uninstall</string>
+    <string name="action_info">App Info</string>
+    <string name="action_launch">Launch</string>
+
+    <!-- Sorting -->
+    <string name="sort_by">Sort By</string>
+    <string name="sort_name">App Name</string>
+    <string name="sort_size">APK Size</string>
+    <string name="sort_install_date">Install Date</string>
+    <string name="sort_update_date">Update Date</string>
+    <string name="sort_date">Date</string>
+
+    <!-- Empty States -->
+    <string name="empty_installed_apps">No applications found.</string>
+    <string name="empty_backups">No backups available. Select an installed app to backup.</string>
+
+    <!-- Settings -->
+    <string name="settings_storage_title">Backup Directory</string>
+    <string name="settings_storage_summary">Tap to choose folder using Storage Access Framework</string>
+    <string name="settings_show_system_title">Show System Apps</string>
+    <string name="settings_show_system_summary">Include pre-installed system applications</string>
+    <string name="settings_dark_mode_title">Dark Theme</string>
+    <string name="settings_dark_mode_summary">Toggle light/dark appearance</string>
+    <string name="settings_sort_title">Default Sort Preference</string>
+    <string name="settings_about_title">About</string>
+    <string name="settings_about_summary">APK Backup &amp; Restore v1.0\nDeveloped using Java and Material Design 3.</string>
+    <string name="settings_reset_directory">Restore Default Directory</string>
+</resources>

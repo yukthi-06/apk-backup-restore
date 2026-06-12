@@ -1,0 +1,302 @@
+create an android application which is basically a "APK Backup and Restore"
+App should be able to extract application APK and save it in configured folder
+User must be able to Uninstall any app
+develop the app in java (not kotlin)
+
+Give it as a single prompt to give to an agent to achieve this
+===================================================================================================
+The chatgpt output from above, use that to give prompt inside IDE
+
+Here's a single, comprehensive prompt you can give to an AI coding agent:
+
+Create a complete Android application named **"APK Backup & Restore"** using **Java (NOT Kotlin)** and Android SDK.
+
+## Objective
+
+Build a modern Android app that allows users to:
+
+1. View all installed applications.
+2. Extract and backup APK files of installed applications.
+3. Save APK files to a user-configurable backup folder.
+4. Restore/install APK files from backups.
+5. Uninstall installed applications.
+6. Browse existing APK backups.
+7. Share backed-up APK files.
+
+## Technical Requirements
+
+### Language & Platform
+
+* Use Java exclusively.
+* Minimum SDK: Android 8.0 (API 26).
+* Target latest Android SDK.
+* Android Studio project.
+* Use AndroidX libraries.
+* Follow MVVM architecture where practical.
+* Use Material Design 3 UI components.
+
+### Core Features
+
+#### 1. Installed Apps Screen
+
+Display all installed applications with:
+
+* App icon
+* App name
+* Package name
+* Version name/version code
+* APK size
+* System app indicator
+* Search functionality
+* Sort by:
+
+  * Name
+  * Size
+  * Install date
+  * Update date
+
+Actions per app:
+
+* Backup APK
+* Share APK
+* Open App Info
+* Launch App
+* Uninstall App
+
+#### 2. APK Backup Functionality
+
+When user taps Backup:
+
+* Extract APK from installed application source directory.
+* Copy APK to configured backup folder.
+* Generate meaningful filename:
+
+AppName_VersionName.apk
+
+Example:
+WhatsApp_2.25.10.apk
+
+Requirements:
+
+* Show progress indicator.
+* Handle storage errors gracefully.
+* Avoid overwriting existing backups unless user confirms.
+* Display success/failure message.
+
+#### 3. Backup Management Screen
+
+Display all backed-up APK files:
+
+* APK icon
+* App name
+* APK filename
+* Version
+* APK size
+* Backup date
+
+Actions:
+
+* Install APK
+* Share APK
+* Delete Backup
+* View APK Details
+
+#### 4. APK Restore / Install
+
+Implement APK installation using:
+
+* FileProvider
+* ACTION_VIEW intent
+* Proper URI permissions
+
+Requirements:
+
+* Support Android 8+ package installation restrictions.
+* Detect and guide user to enable "Install Unknown Apps" permission when required.
+
+#### 5. App Uninstall
+
+Allow uninstalling any non-system application.
+
+Implementation:
+
+* Use ACTION_DELETE intent.
+* Show confirmation dialog before uninstall.
+* Refresh app list after uninstall.
+
+#### 6. Configurable Backup Folder
+
+Settings screen must allow:
+
+* Select backup folder using Storage Access Framework.
+* Persist selected folder URI permissions.
+* Display current backup location.
+* Restore default location.
+
+Default backup location:
+Internal Storage/APK_Backups/
+
+#### 7. Runtime Permissions
+
+Handle:
+
+* Storage permissions where applicable.
+* Android 10+ scoped storage requirements.
+* Android 11+ package visibility requirements.
+* Android 13+ media/storage behavior.
+
+#### 8. APK Metadata Extraction
+
+Extract and display:
+
+* Package name
+* Version name
+* Version code
+* Minimum SDK
+* Target SDK
+* APK size
+* Application label
+
+Use PackageManager APIs.
+
+## User Interface
+
+### Bottom Navigation
+
+Tabs:
+
+1. Installed Apps
+2. Backups
+3. Settings
+
+### Installed Apps Screen
+
+* RecyclerView
+* SearchView
+* Pull-to-refresh
+* Material cards
+
+### Backups Screen
+
+* RecyclerView
+* Search
+* Sort options
+* Empty-state screen
+
+### Settings Screen
+
+Options:
+
+* Backup folder selection
+* Dark mode toggle
+* Show system apps toggle
+* Sort preference
+* About section
+
+## Architecture
+
+Implement:
+
+### Packages
+
+com.example.apkbackuprestore
+
+Sub-packages:
+
+* activities
+* fragments
+* adapters
+* models
+* repositories
+* viewmodels
+* utils
+* services
+
+### Components
+
+Create:
+
+* MainActivity
+* InstalledAppsFragment
+* BackupsFragment
+* SettingsFragment
+* AppListAdapter
+* BackupListAdapter
+* ApkBackupManager
+* ApkRestoreManager
+* StorageManager
+* PermissionManager
+
+## Data Models
+
+### AppInfo
+
+Fields:
+
+* appName
+* packageName
+* versionName
+* versionCode
+* apkPath
+* apkSize
+* icon
+* isSystemApp
+
+### BackupInfo
+
+Fields:
+
+* fileName
+* filePath
+* appName
+* versionName
+* backupDate
+* fileSize
+
+## Utilities
+
+Implement helper classes for:
+
+* APK extraction
+* File operations
+* Permission handling
+* Package information
+* Date formatting
+* Storage access
+
+## Security & Compatibility
+
+Requirements:
+
+* Use FileProvider.
+* Follow scoped storage guidelines.
+* No root access required.
+* Handle all Android versions from API 26 onward.
+* Gracefully handle unavailable permissions.
+* Prevent app crashes through proper exception handling.
+
+## Deliverables
+
+Generate a complete Android Studio project including:
+
+1. Full Java source code.
+2. AndroidManifest.xml.
+3. Gradle configuration files.
+4. FileProvider configuration.
+5. Layout XML files.
+6. RecyclerView adapters.
+7. ViewModels and repositories.
+8. Utility/helper classes.
+9. Material Design UI.
+10. Comments explaining key implementation details.
+11. README.md with:
+
+    * Build instructions
+    * Required permissions
+    * APK backup workflow
+    * Restore workflow
+    * Android version compatibility notes
+
+Ensure the project builds successfully without placeholders, TODOs, mock implementations, or incomplete code. All features must be fully implemented and production-ready.
+
+This prompt is detailed enough for a coding agent (Claude Code, Cursor, Windsurf, Cline, Roo Code, Copilot Agent, etc.) to generate the entire Android Studio project in Java.
