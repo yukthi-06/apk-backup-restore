@@ -1,4 +1,4 @@
-package com.example.apkbackuprestore.adapters;
+package com.vypeensoft.apkbackuprestore.adapters;
 
 import android.content.Context;
 import android.text.format.Formatter;
@@ -14,8 +14,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
-import com.example.apkbackuprestore.R;
-import com.example.apkbackuprestore.models.AppInfo;
+import com.vypeensoft.apkbackuprestore.R;
+import com.vypeensoft.apkbackuprestore.models.AppInfo;
 import java.util.ArrayList;
 import java.util.List;
 

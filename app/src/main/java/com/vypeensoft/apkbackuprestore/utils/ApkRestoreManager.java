@@ -1,4 +1,4 @@
-package com.example.apkbackuprestore.utils;
+package com.vypeensoft.apkbackuprestore.utils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,7 +7,7 @@ import android.os.Build;
 import android.provider.Settings;
 import android.widget.Toast;
 import androidx.core.content.FileProvider;
-import com.example.apkbackuprestore.models.BackupInfo;
+import com.vypeensoft.apkbackuprestore.models.BackupInfo;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -63,7 +63,7 @@ public class ApkRestoreManager {
 
                 // Get FileProvider URI
                 Uri apkUri = FileProvider.getUriForFile(context, 
-                        "com.example.apkbackuprestore.fileprovider", tempApk);
+                        "com.vypeensoft.apkbackuprestore.fileprovider", tempApk);
 
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setDataAndType(apkUri, "application/vnd.android.package-archive");

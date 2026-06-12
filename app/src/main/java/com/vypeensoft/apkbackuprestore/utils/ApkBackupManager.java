@@ -1,9 +1,9 @@
-package com.example.apkbackuprestore.utils;
+package com.vypeensoft.apkbackuprestore.utils;
 
 import android.content.Context;
 import android.net.Uri;
 import androidx.documentfile.provider.DocumentFile;
-import com.example.apkbackuprestore.models.AppInfo;
+import com.vypeensoft.apkbackuprestore.models.AppInfo;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;

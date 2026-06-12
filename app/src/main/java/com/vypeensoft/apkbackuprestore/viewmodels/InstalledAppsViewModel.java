@@ -1,12 +1,12 @@
-package com.example.apkbackuprestore.viewmodels;
+package com.vypeensoft.apkbackuprestore.viewmodels;
 
 import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import com.example.apkbackuprestore.models.AppInfo;
-import com.example.apkbackuprestore.repositories.AppRepository;
+import com.vypeensoft.apkbackuprestore.models.AppInfo;
+import com.vypeensoft.apkbackuprestore.repositories.AppRepository;
 import java.util.List;
 
 public class InstalledAppsViewModel extends AndroidViewModel {

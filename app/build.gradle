@@ -8,7 +8,7 @@ def gitShaFull = 'git rev-parse         HEAD'.execute().text.trim()
 def gitTag     = 'git describe        --tags'.execute().text.trim()
 
 android {
-    namespace 'com.example.apkbackuprestore'
+    namespace 'com.vypeensoft.apkbackuprestore'
     compileSdk 34
 
     buildFeatures {
@@ -16,7 +16,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.example.apkbackuprestore"
+        applicationId "com.vypeensoft.apkbackuprestore"
         minSdk 26
         targetSdk 34
         versionCode 1

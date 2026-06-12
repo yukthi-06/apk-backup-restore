@@ -10,8 +10,4 @@
         android:icon="@drawable/ic_backup"
         android:title="Backups" />
 
-    <item
-        android:id="@+id/navigation_settings"
-        android:icon="@drawable/ic_settings"
-        android:title="Settings" />
 </menu>

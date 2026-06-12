@@ -34,4 +34,10 @@
     <string name="settings_about_title">About</string>
     <string name="settings_about_summary">APK Backup &amp; Restore v1.0\nDeveloped using Java and Material Design 3.</string>
     <string name="settings_reset_directory">Restore Default Directory</string>
+    
+    <!-- Drawer / Help / About Strings -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="title_about">About</string>
+    <string name="about_description">APK Backup &amp; Restore is a premium utility application that enables extracting base APKs from your installed Android packages and managing backups locally. Built with Java and Material Design 3.</string>
 </resources>

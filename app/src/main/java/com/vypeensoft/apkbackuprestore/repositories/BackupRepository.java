@@ -1,4 +1,4 @@
-package com.example.apkbackuprestore.repositories;
+package com.vypeensoft.apkbackuprestore.repositories;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
@@ -7,9 +7,9 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import androidx.core.content.ContextCompat;
 import androidx.documentfile.provider.DocumentFile;
-import com.example.apkbackuprestore.R;
-import com.example.apkbackuprestore.models.BackupInfo;
-import com.example.apkbackuprestore.utils.StorageManager;
+import com.vypeensoft.apkbackuprestore.R;
+import com.vypeensoft.apkbackuprestore.models.BackupInfo;
+import com.vypeensoft.apkbackuprestore.utils.StorageManager;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;

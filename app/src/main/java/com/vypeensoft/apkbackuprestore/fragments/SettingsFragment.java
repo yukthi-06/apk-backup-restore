@@ -1,4 +1,4 @@
-package com.example.apkbackuprestore.fragments;
+package com.vypeensoft.apkbackuprestore.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -17,8 +17,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
-import com.example.apkbackuprestore.R;
-import com.example.apkbackuprestore.utils.StorageManager;
+import com.vypeensoft.apkbackuprestore.R;
+import com.vypeensoft.apkbackuprestore.utils.StorageManager;
 import com.google.android.material.materialswitch.MaterialSwitch;
 
 public class SettingsFragment extends Fragment {

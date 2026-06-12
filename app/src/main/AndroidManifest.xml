@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.apkbackuprestore">
+    package="com.vypeensoft.apkbackuprestore">
 
     <!-- Permissions for querying installed packages -->
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
@@ -37,10 +37,25 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.ApkBackupRestore" />
+
+        <activity
+            android:name=".activities.HelpActivity"
+            android:exported="false"
+            android:theme="@style/Theme.ApkBackupRestore" />
+
+        <activity
+            android:name=".activities.AboutActivity"
+            android:exported="false"
+            android:theme="@style/Theme.ApkBackupRestore" />
+
         <!-- FileProvider for secure APK file sharing and installation -->
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.example.apkbackuprestore.fileprovider"
+            android:authorities="com.vypeensoft.apkbackuprestore.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

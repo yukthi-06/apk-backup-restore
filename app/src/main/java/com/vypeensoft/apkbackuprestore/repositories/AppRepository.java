@@ -1,11 +1,11 @@
-package com.example.apkbackuprestore.repositories;
+package com.vypeensoft.apkbackuprestore.repositories;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
-import com.example.apkbackuprestore.models.AppInfo;
+import com.vypeensoft.apkbackuprestore.models.AppInfo;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;

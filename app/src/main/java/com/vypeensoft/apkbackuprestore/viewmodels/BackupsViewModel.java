@@ -1,12 +1,12 @@
-package com.example.apkbackuprestore.viewmodels;
+package com.vypeensoft.apkbackuprestore.viewmodels;
 
 import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import com.example.apkbackuprestore.models.BackupInfo;
-import com.example.apkbackuprestore.repositories.BackupRepository;
+import com.vypeensoft.apkbackuprestore.models.BackupInfo;
+import com.vypeensoft.apkbackuprestore.repositories.BackupRepository;
 import java.util.List;
 
 public class BackupsViewModel extends AndroidViewModel {

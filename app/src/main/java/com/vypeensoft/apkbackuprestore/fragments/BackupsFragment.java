@@ -1,4 +1,4 @@
-package com.example.apkbackuprestore.fragments;
+package com.vypeensoft.apkbackuprestore.fragments;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -22,11 +22,11 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import com.example.apkbackuprestore.R;
-import com.example.apkbackuprestore.adapters.BackupListAdapter;
-import com.example.apkbackuprestore.models.BackupInfo;
-import com.example.apkbackuprestore.utils.ApkRestoreManager;
-import com.example.apkbackuprestore.viewmodels.BackupsViewModel;
+import com.vypeensoft.apkbackuprestore.R;
+import com.vypeensoft.apkbackuprestore.adapters.BackupListAdapter;
+import com.vypeensoft.apkbackuprestore.models.BackupInfo;
+import com.vypeensoft.apkbackuprestore.utils.ApkRestoreManager;
+import com.vypeensoft.apkbackuprestore.viewmodels.BackupsViewModel;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -204,7 +204,7 @@ public class BackupsFragment extends Fragment implements BackupListAdapter.Backu
                 }
 
                 Uri shareUri = FileProvider.getUriForFile(requireContext(),
-                        "com.example.apkbackuprestore.fileprovider", cacheFile);
+                        "com.vypeensoft.apkbackuprestore.fileprovider", cacheFile);
 
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("application/vnd.android.package-archive");

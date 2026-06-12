@@ -1,4 +1,4 @@
-package com.example.apkbackuprestore.adapters;
+package com.vypeensoft.apkbackuprestore.adapters;
 
 import android.content.Context;
 import android.text.format.Formatter;
@@ -13,8 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
-import com.example.apkbackuprestore.R;
-import com.example.apkbackuprestore.models.BackupInfo;
+import com.vypeensoft.apkbackuprestore.R;
+import com.vypeensoft.apkbackuprestore.models.BackupInfo;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
