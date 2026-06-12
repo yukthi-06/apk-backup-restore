@@ -306,6 +306,7 @@ public class BackupsFragment extends Fragment implements BackupListAdapter.Backu
         if (installQueue == null || installQueue.isEmpty()) {
             Toast.makeText(getContext(), "Installation queue finished.", Toast.LENGTH_SHORT).show();
             installQueue = null;
+            adapter.clearSelection();
             viewModel.loadBackups();
             return;
         }
@@ -372,6 +373,7 @@ public class BackupsFragment extends Fragment implements BackupListAdapter.Backu
                         }
                     }
                     Toast.makeText(getContext(), "Deleted " + deletedCount + " backups.", Toast.LENGTH_SHORT).show();
+                    adapter.clearSelection();
                     viewModel.loadBackups();
                 })
                 .setNegativeButton("Cancel", null)

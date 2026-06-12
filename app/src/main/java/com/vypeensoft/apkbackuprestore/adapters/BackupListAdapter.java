@@ -17,7 +17,9 @@ import com.vypeensoft.apkbackuprestore.models.BackupInfo;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class BackupListAdapter extends RecyclerView.Adapter<BackupListAdapter.BackupViewHolder> {
 
@@ -31,6 +33,7 @@ public class BackupListAdapter extends RecyclerView.Adapter<BackupListAdapter.Ba
     private final Context context;
     private final List<BackupInfo> backupList = new ArrayList<>();
     private final BackupActionListener listener;
+    private final Set<String> selectedFileNames = new HashSet<>();
 
     public BackupListAdapter(Context context, BackupActionListener listener) {
         this.context = context;
@@ -38,6 +41,10 @@ public class BackupListAdapter extends RecyclerView.Adapter<BackupListAdapter.Ba
     }
 
     public void setBackups(List<BackupInfo> newBackups) {
+        for (BackupInfo backup : newBackups) {
+            backup.setSelected(selectedFileNames.contains(backup.getFileName()));
+        }
+
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
             @Override
             public int getOldListSize() { return backupList.size(); }
@@ -71,6 +78,14 @@ public class BackupListAdapter extends RecyclerView.Adapter<BackupListAdapter.Ba
             }
         }
         return selected;
+    }
+
+    public void clearSelection() {
+        selectedFileNames.clear();
+        for (BackupInfo b : backupList) {
+            b.setSelected(false);
+        }
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -125,7 +140,14 @@ public class BackupListAdapter extends RecyclerView.Adapter<BackupListAdapter.Ba
             // Remove listener before setting checked status to avoid side effects during recycling
             cbSelect.setOnCheckedChangeListener(null);
             cbSelect.setChecked(backupInfo.isSelected());
-            cbSelect.setOnCheckedChangeListener((buttonView, isChecked) -> backupInfo.setSelected(isChecked));
+            cbSelect.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                backupInfo.setSelected(isChecked);
+                if (isChecked) {
+                    selectedFileNames.add(backupInfo.getFileName());
+                } else {
+                    selectedFileNames.remove(backupInfo.getFileName());
+                }
+            });
 
             btnInfo.setOnClickListener(v -> listener.onViewDetails(backupInfo));
         }

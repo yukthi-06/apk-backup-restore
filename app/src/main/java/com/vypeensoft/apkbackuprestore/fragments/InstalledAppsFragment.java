@@ -332,10 +332,7 @@ public class InstalledAppsFragment extends Fragment implements AppListAdapter.Ap
             requireActivity().runOnUiThread(() -> {
                 dialog.dismiss();
                 Toast.makeText(getContext(), "Successfully backed up " + apps.size() + " apps.", Toast.LENGTH_SHORT).show();
-                for (AppInfo app : apps) {
-                    app.setSelected(false);
-                }
-                adapter.notifyDataSetChanged();
+                adapter.clearSelection();
             });
             return;
         }
@@ -383,6 +380,7 @@ public class InstalledAppsFragment extends Fragment implements AppListAdapter.Ap
         if (uninstallQueue == null || uninstallQueue.isEmpty()) {
             Toast.makeText(getContext(), "Uninstall queue finished.", Toast.LENGTH_SHORT).show();
             uninstallQueue = null;
+            adapter.clearSelection();
             viewModel.loadApps();
             return;
         }

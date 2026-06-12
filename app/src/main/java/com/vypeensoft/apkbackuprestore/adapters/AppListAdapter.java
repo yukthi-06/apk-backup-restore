@@ -15,7 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.vypeensoft.apkbackuprestore.R;
 import com.vypeensoft.apkbackuprestore.models.AppInfo;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.AppViewHolder> {
 
@@ -30,6 +32,7 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.AppViewH
     private final Context context;
     private final List<AppInfo> appList = new ArrayList<>();
     private final AppActionListener listener;
+    private final Set<String> selectedPackages = new HashSet<>();
 
     public AppListAdapter(Context context, AppActionListener listener) {
         this.context = context;
@@ -37,6 +40,10 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.AppViewH
     }
 
     public void setApps(List<AppInfo> newApps) {
+        for (AppInfo app : newApps) {
+            app.setSelected(selectedPackages.contains(app.getPackageName()));
+        }
+
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
             @Override
             public int getOldListSize() { return appList.size(); }
@@ -69,6 +76,14 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.AppViewH
             }
         }
         return selected;
+    }
+
+    public void clearSelection() {
+        selectedPackages.clear();
+        for (AppInfo app : appList) {
+            app.setSelected(false);
+        }
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -121,7 +136,14 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.AppViewH
             // Remove listener before setting state to avoid side effects during recycling
             cbSelect.setOnCheckedChangeListener(null);
             cbSelect.setChecked(appInfo.isSelected());
-            cbSelect.setOnCheckedChangeListener((buttonView, isChecked) -> appInfo.setSelected(isChecked));
+            cbSelect.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                appInfo.setSelected(isChecked);
+                if (isChecked) {
+                    selectedPackages.add(appInfo.getPackageName());
+                } else {
+                    selectedPackages.remove(appInfo.getPackageName());
+                }
+            });
 
             btnInfo.setOnClickListener(v -> listener.onOpenInfo(appInfo));
         }
