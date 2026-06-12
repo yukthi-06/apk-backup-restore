@@ -26,6 +26,9 @@
         <item name="colorOnSurface">@color/onSurface</item>
         <item name="colorSurfaceVariant">@color/surfaceVariant</item>
         <item name="colorOnSurfaceVariant">@color/onSurfaceVariant</item>
+
+        <!-- Material Alert Dialog theme override -->
+        <item name="materialAlertDialogTheme">@style/CustomAlertDialogTheme</item>
     </style>
 
     <!-- Style to force black text/icons on white search background -->
@@ -34,5 +37,14 @@
         <item name="android:textColor">@android:color/black</item>
         <item name="android:textColorHint">#888888</item>
         <item name="android:tint">@android:color/black</item>
+    </style>
+
+    <!-- Theme overlay for Material Alert Dialog to ensure white background and black text -->
+    <style name="CustomAlertDialogTheme" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorSurface">@android:color/white</item>
+        <item name="colorOnSurface">@android:color/black</item>
+        <item name="colorOnSurfaceVariant">@android:color/black</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
+        <item name="colorPrimary">@color/primary</item>
     </style>
 </resources>
