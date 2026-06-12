@@ -80,6 +80,14 @@ public class MainActivity extends AppCompatActivity {
         fragmentManager.beginTransaction().hide(activeFragment).show(backupsFragment).commit();
         activeFragment = backupsFragment;
         toolbar.setTitle(R.string.title_backups);
+        
+        // Show back button on toolbar
+        if (getSupportActionBar() != null) {
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            toolbar.setNavigationOnClickListener(v -> showInstalledFragment());
+        }
+        
         // Trigger reload of backups when switching tabs
         ((BackupsFragment) backupsFragment).onResume();
     }
@@ -88,6 +96,18 @@ public class MainActivity extends AppCompatActivity {
         fragmentManager.beginTransaction().hide(activeFragment).show(installedFragment).commit();
         activeFragment = installedFragment;
         toolbar.setTitle(R.string.title_installed);
+        
+        // Restore drawer toggle on toolbar
+        if (getSupportActionBar() != null) {
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                    this, drawerLayout, toolbar,
+                    R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+            drawerLayout.addDrawerListener(toggle);
+            toggle.syncState();
+            toolbar.setNavigationOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
+        }
     }
 
     @Override
