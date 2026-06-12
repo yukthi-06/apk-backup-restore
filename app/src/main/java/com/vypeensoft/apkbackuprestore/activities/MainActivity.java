@@ -29,9 +29,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Apply saved dark mode preference before super.onCreate
-        applySavedNightMode();
-        
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
