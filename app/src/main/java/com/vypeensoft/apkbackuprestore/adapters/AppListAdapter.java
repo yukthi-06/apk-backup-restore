@@ -71,7 +71,7 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.AppViewH
     public List<AppInfo> getSelectedApps() {
         List<AppInfo> selected = new ArrayList<>();
         for (AppInfo app : appList) {
-            if (app.isSelected()) {
+            if (selectedPackages.contains(app.getPackageName())) {
                 selected.add(app);
             }
         }

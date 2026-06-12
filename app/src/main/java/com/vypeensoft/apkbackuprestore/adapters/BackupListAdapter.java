@@ -73,7 +73,7 @@ public class BackupListAdapter extends RecyclerView.Adapter<BackupListAdapter.Ba
     public List<BackupInfo> getSelectedBackups() {
         List<BackupInfo> selected = new ArrayList<>();
         for (BackupInfo b : backupList) {
-            if (b.isSelected()) {
+            if (selectedFileNames.contains(b.getFileName())) {
                 selected.add(b);
             }
         }
