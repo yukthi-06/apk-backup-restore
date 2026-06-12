@@ -13,6 +13,7 @@ public class AppInfo {
     private boolean isSystemApp;
     private long installDate;
     private long updateDate;
+    private boolean isSelected;
 
     public AppInfo(String appName, String packageName, String versionName, int versionCode, 
                    String apkPath, long apkSize, Drawable icon, boolean isSystemApp, 
@@ -27,6 +28,7 @@ public class AppInfo {
         this.isSystemApp = isSystemApp;
         this.installDate = installDate;
         this.updateDate = updateDate;
+        this.isSelected = false;
     }
 
     public String getAppName() { return appName; }
@@ -39,4 +41,6 @@ public class AppInfo {
     public boolean isSystemApp() { return isSystemApp; }
     public long getInstallDate() { return installDate; }
     public long getUpdateDate() { return updateDate; }
+    public boolean isSelected() { return isSelected; }
+    public void setSelected(boolean selected) { this.isSelected = selected; }
 }

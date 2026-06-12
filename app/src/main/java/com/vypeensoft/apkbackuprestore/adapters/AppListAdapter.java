@@ -3,15 +3,13 @@ package com.vypeensoft.apkbackuprestore.adapters;
 import android.content.Context;
 import android.text.format.Formatter;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import com.vypeensoft.apkbackuprestore.R;
@@ -54,7 +52,8 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.AppViewH
                 AppInfo newApp = newApps.get(newItemPosition);
                 return oldApp.getAppName().equals(newApp.getAppName()) &&
                        oldApp.getVersionName().equals(newApp.getVersionName()) &&
-                       oldApp.getApkSize() == newApp.getApkSize();
+                       oldApp.getApkSize() == newApp.getApkSize() &&
+                       oldApp.isSelected() == newApp.isSelected();
             }
         });
         appList.clear();
@@ -81,27 +80,25 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.AppViewH
     }
 
     class AppViewHolder extends RecyclerView.ViewHolder {
+        CheckBox cbSelect;
         ImageView imgIcon;
-        TextView tvName, tvPackage, tvVersion, tvSize, tvSystemBadge;
-        Button btnBackup;
-        ImageButton btnOptions;
+        TextView tvName, tvVersion, tvSize, tvSystemBadge;
+        ImageButton btnInfo;
 
         public AppViewHolder(@NonNull View itemView) {
             super(itemView);
+            cbSelect = itemView.findViewById(R.id.cb_app_select);
             imgIcon = itemView.findViewById(R.id.img_app_icon);
             tvName = itemView.findViewById(R.id.tv_app_name);
-            tvPackage = itemView.findViewById(R.id.tv_package_name);
             tvVersion = itemView.findViewById(R.id.tv_app_version);
             tvSize = itemView.findViewById(R.id.tv_app_size);
             tvSystemBadge = itemView.findViewById(R.id.tv_system_badge);
-            btnBackup = itemView.findViewById(R.id.btn_app_backup);
-            btnOptions = itemView.findViewById(R.id.btn_app_options);
+            btnInfo = itemView.findViewById(R.id.btn_app_info);
         }
 
         public void bind(AppInfo appInfo) {
             imgIcon.setImageDrawable(appInfo.getIcon());
             tvName.setText(appInfo.getAppName());
-            tvPackage.setText(appInfo.getPackageName());
             tvVersion.setText("v" + appInfo.getVersionName());
             tvSize.setText(Formatter.formatFileSize(context, appInfo.getApkSize()));
 
@@ -111,32 +108,12 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.AppViewH
                 tvSystemBadge.setVisibility(View.GONE);
             }
 
-            btnBackup.setOnClickListener(v -> listener.onBackup(appInfo));
-            
-            btnOptions.setOnClickListener(v -> {
-                PopupMenu popup = new PopupMenu(context, btnOptions);
-                popup.getMenuInflater().inflate(R.menu.app_options_menu, popup.getMenu());
-                
-                // Disable launch if not launchable or if package uninstalled
-                popup.setOnMenuItemClickListener(item -> {
-                    int id = item.getItemId();
-                    if (id == R.id.menu_launch) {
-                        listener.onLaunch(appInfo);
-                        return true;
-                    } else if (id == R.id.menu_info) {
-                        listener.onOpenInfo(appInfo);
-                        return true;
-                    } else if (id == R.id.menu_share) {
-                        listener.onShare(appInfo);
-                        return true;
-                    } else if (id == R.id.menu_uninstall) {
-                        listener.onUninstall(appInfo);
-                        return true;
-                    }
-                    return false;
-                });
-                popup.show();
-            });
+            // Remove listener before setting state to avoid side effects during recycling
+            cbSelect.setOnCheckedChangeListener(null);
+            cbSelect.setChecked(appInfo.isSelected());
+            cbSelect.setOnCheckedChangeListener((buttonView, isChecked) -> appInfo.setSelected(isChecked));
+
+            btnInfo.setOnClickListener(v -> listener.onOpenInfo(appInfo));
         }
     }
 }
