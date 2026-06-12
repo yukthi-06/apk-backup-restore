@@ -68,32 +68,26 @@ public class MainActivity extends AppCompatActivity {
         // Set Main checked by default
         navDrawer.setCheckedItem(R.id.nav_main);
 
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-
         // Preload and hide backups fragment to preserve state, 
         // showing the installed fragment by default.
         fragmentManager.beginTransaction().add(R.id.nav_host_fragment, backupsFragment, "backups").hide(backupsFragment).commit();
         fragmentManager.beginTransaction().add(R.id.nav_host_fragment, installedFragment, "installed").commit();
 
         toolbar.setTitle(R.string.title_installed);
+    }
 
-        navView.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.navigation_installed) {
-                fragmentManager.beginTransaction().hide(activeFragment).show(installedFragment).commit();
-                activeFragment = installedFragment;
-                toolbar.setTitle(R.string.title_installed);
-                return true;
-            } else if (itemId == R.id.navigation_backups) {
-                fragmentManager.beginTransaction().hide(activeFragment).show(backupsFragment).commit();
-                activeFragment = backupsFragment;
-                toolbar.setTitle(R.string.title_backups);
-                // Trigger reload of backups when switching tabs
-                ((BackupsFragment) backupsFragment).onResume();
-                return true;
-            }
-            return false;
-        });
+    public void showBackupsFragment() {
+        fragmentManager.beginTransaction().hide(activeFragment).show(backupsFragment).commit();
+        activeFragment = backupsFragment;
+        toolbar.setTitle(R.string.title_backups);
+        // Trigger reload of backups when switching tabs
+        ((BackupsFragment) backupsFragment).onResume();
+    }
+
+    public void showInstalledFragment() {
+        fragmentManager.beginTransaction().hide(activeFragment).show(installedFragment).commit();
+        activeFragment = installedFragment;
+        toolbar.setTitle(R.string.title_installed);
     }
 
     @Override

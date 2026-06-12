@@ -14,6 +14,7 @@ public class BackupInfo {
     private long backupDate;
     private long fileSize;
     private Drawable icon;
+    private boolean isSelected;
 
     public BackupInfo(String fileName, String filePath, Uri fileUri, String appName, 
                       String packageName, String versionName, int versionCode, 
@@ -28,6 +29,7 @@ public class BackupInfo {
         this.backupDate = backupDate;
         this.fileSize = fileSize;
         this.icon = icon;
+        this.isSelected = false;
     }
 
     public String getFileName() { return fileName; }
@@ -41,4 +43,6 @@ public class BackupInfo {
     public long getFileSize() { return fileSize; }
     public Drawable getIcon() { return icon; }
     public void setIcon(Drawable icon) { this.icon = icon; }
+    public boolean isSelected() { return isSelected; }
+    public void setSelected(boolean selected) { this.isSelected = selected; }
 }

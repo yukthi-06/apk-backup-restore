@@ -8,6 +8,7 @@ import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -23,6 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.vypeensoft.apkbackuprestore.R;
+import com.vypeensoft.apkbackuprestore.activities.MainActivity;
 import com.vypeensoft.apkbackuprestore.adapters.AppListAdapter;
 import com.vypeensoft.apkbackuprestore.models.AppInfo;
 import com.vypeensoft.apkbackuprestore.models.AppSettings;
@@ -34,6 +36,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -47,6 +51,7 @@ public class InstalledAppsFragment extends Fragment implements AppListAdapter.Ap
     private TextView tvEmpty;
     private ApkBackupManager backupManager;
     private ExecutorService shareExecutor;
+    private List<String> uninstallQueue;
 
     @Nullable
     @Override
@@ -60,6 +65,18 @@ public class InstalledAppsFragment extends Fragment implements AppListAdapter.Ap
         
         SearchView searchView = view.findViewById(R.id.search_view);
         ImageButton btnSort = view.findViewById(R.id.btn_sort);
+
+        Button btnBatchBackup = view.findViewById(R.id.btn_batch_backup);
+        Button btnBatchUninstall = view.findViewById(R.id.btn_batch_uninstall);
+        Button btnGoRestore = view.findViewById(R.id.btn_go_restore);
+
+        btnBatchBackup.setOnClickListener(v -> performBatchBackup());
+        btnBatchUninstall.setOnClickListener(v -> performBatchUninstall());
+        btnGoRestore.setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).showBackupsFragment();
+            }
+        });
 
         backupManager = new ApkBackupManager(requireContext());
         shareExecutor = Executors.newSingleThreadExecutor();
@@ -113,7 +130,20 @@ public class InstalledAppsFragment extends Fragment implements AppListAdapter.Ap
         // Automatically check Settings and reload apps
         AppSettings settings = AppSettings.load();
         viewModel.setShowSystemApps(settings.showSystemApps);
-        viewModel.loadApps();
+        
+        if (uninstallQueue != null && !uninstallQueue.isEmpty()) {
+            String pkg = uninstallQueue.get(0);
+            if (!isPackageInstalled(pkg)) {
+                // Successfully uninstalled!
+                uninstallQueue.remove(0);
+            } else {
+                // User cancelled or skipped. Remove it so we don't get stuck.
+                uninstallQueue.remove(0);
+            }
+            processNextUninstall();
+        } else {
+            viewModel.loadApps();
+        }
     }
 
     private void showSortDialog() {
@@ -280,6 +310,116 @@ public class InstalledAppsFragment extends Fragment implements AppListAdapter.Ap
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
+    }
+
+    private void performBatchBackup() {
+        List<AppInfo> apps = viewModel.getInstalledApps().getValue();
+        if (apps == null) return;
+        List<AppInfo> selected = new ArrayList<>();
+        for (AppInfo app : apps) {
+            if (app.isSelected()) {
+                selected.add(app);
+            }
+        }
+        if (selected.isEmpty()) {
+            Toast.makeText(getContext(), "No applications selected.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        AlertDialog progressDialog = new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Backing up applications")
+                .setMessage("Starting...")
+                .setCancelable(false)
+                .create();
+        progressDialog.show();
+        runBatchBackup(selected, 0, progressDialog);
+    }
+
+    private void runBatchBackup(List<AppInfo> apps, int index, AlertDialog dialog) {
+        if (index >= apps.size()) {
+            requireActivity().runOnUiThread(() -> {
+                dialog.dismiss();
+                Toast.makeText(getContext(), "Successfully backed up " + apps.size() + " apps.", Toast.LENGTH_SHORT).show();
+                for (AppInfo app : apps) {
+                    app.setSelected(false);
+                }
+                adapter.notifyDataSetChanged();
+            });
+            return;
+        }
+        AppInfo app = apps.get(index);
+        requireActivity().runOnUiThread(() -> {
+            dialog.setMessage("Backing up " + app.getAppName() + " (" + (index + 1) + "/" + apps.size() + ")...");
+        });
+        backupManager.backupApp(app, true, new ApkBackupManager.BackupListener() {
+            @Override
+            public void onStart() {}
+
+            @Override
+            public void onProgress(int progress) {}
+
+            @Override
+            public void onSuccess(String filePath) {
+                runBatchBackup(apps, index + 1, dialog);
+            }
+
+            @Override
+            public void onError(String message) {
+                requireActivity().runOnUiThread(() -> {
+                    Toast.makeText(getContext(), "Error backing up " + app.getAppName() + ": " + message, Toast.LENGTH_SHORT).show();
+                });
+                runBatchBackup(apps, index + 1, dialog);
+            }
+        });
+    }
+
+    private void performBatchUninstall() {
+        List<AppInfo> apps = viewModel.getInstalledApps().getValue();
+        if (apps == null) return;
+        List<String> selected = new ArrayList<>();
+        for (AppInfo app : apps) {
+            if (app.isSelected()) {
+                selected.add(app.getPackageName());
+            }
+        }
+        if (selected.isEmpty()) {
+            Toast.makeText(getContext(), "No applications selected.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        uninstallQueue = selected;
+        processNextUninstall();
+    }
+
+    private void processNextUninstall() {
+        if (uninstallQueue == null || uninstallQueue.isEmpty()) {
+            Toast.makeText(getContext(), "Uninstall queue finished.", Toast.LENGTH_SHORT).show();
+            uninstallQueue = null;
+            viewModel.loadApps();
+            return;
+        }
+        String pkg = uninstallQueue.get(0);
+        if (!isPackageInstalled(pkg)) {
+            uninstallQueue.remove(0);
+            processNextUninstall();
+            return;
+        }
+        try {
+            Intent intent = new Intent(Intent.ACTION_DELETE);
+            intent.setData(Uri.parse("package:" + pkg));
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(getContext(), "Cannot uninstall: " + pkg, Toast.LENGTH_SHORT).show();
+            uninstallQueue.remove(0);
+            processNextUninstall();
+        }
+    }
+
+    private boolean isPackageInstalled(String packageName) {
+        try {
+            requireContext().getPackageManager().getPackageInfo(packageName, 0);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override

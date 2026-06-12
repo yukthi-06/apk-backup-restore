@@ -5,12 +5,11 @@ import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import com.vypeensoft.apkbackuprestore.R;
@@ -55,7 +54,8 @@ public class BackupListAdapter extends RecyclerView.Adapter<BackupListAdapter.Ba
                 return oldBackup.getAppName().equals(newBackup.getAppName()) &&
                        oldBackup.getVersionName().equals(newBackup.getVersionName()) &&
                        oldBackup.getFileSize() == newBackup.getFileSize() &&
-                       oldBackup.getBackupDate() == newBackup.getBackupDate();
+                       oldBackup.getBackupDate() == newBackup.getBackupDate() &&
+                       oldBackup.isSelected() == newBackup.isSelected();
             }
         });
         backupList.clear();
@@ -82,21 +82,20 @@ public class BackupListAdapter extends RecyclerView.Adapter<BackupListAdapter.Ba
     }
 
     class BackupViewHolder extends RecyclerView.ViewHolder {
+        CheckBox cbSelect;
         ImageView imgIcon;
-        TextView tvAppName, tvFileName, tvVersion, tvSize, tvDate;
-        Button btnInstall;
-        ImageButton btnOptions;
+        TextView tvAppName, tvVersion, tvSize, tvDate;
+        ImageButton btnInfo;
 
         public BackupViewHolder(@NonNull View itemView) {
             super(itemView);
+            cbSelect = itemView.findViewById(R.id.cb_backup_select);
             imgIcon = itemView.findViewById(R.id.img_backup_icon);
             tvAppName = itemView.findViewById(R.id.tv_backup_name);
-            tvFileName = itemView.findViewById(R.id.tv_backup_filename);
             tvVersion = itemView.findViewById(R.id.tv_backup_version);
             tvSize = itemView.findViewById(R.id.tv_backup_size);
             tvDate = itemView.findViewById(R.id.tv_backup_date);
-            btnInstall = itemView.findViewById(R.id.btn_backup_install);
-            btnOptions = itemView.findViewById(R.id.btn_backup_options);
+            btnInfo = itemView.findViewById(R.id.btn_backup_info);
         }
 
         public void bind(BackupInfo backupInfo) {
@@ -107,38 +106,18 @@ public class BackupListAdapter extends RecyclerView.Adapter<BackupListAdapter.Ba
             }
             
             tvAppName.setText(backupInfo.getAppName());
-            tvFileName.setText(backupInfo.getFileName());
             tvVersion.setText("v" + backupInfo.getVersionName());
             tvSize.setText(Formatter.formatFileSize(context, backupInfo.getFileSize()));
             
             String formattedDate = DateFormat.getDateInstance(DateFormat.SHORT).format(new Date(backupInfo.getBackupDate()));
             tvDate.setText(formattedDate);
 
-            btnInstall.setOnClickListener(v -> listener.onInstall(backupInfo));
+            // Remove listener before setting checked status to avoid side effects during recycling
+            cbSelect.setOnCheckedChangeListener(null);
+            cbSelect.setChecked(backupInfo.isSelected());
+            cbSelect.setOnCheckedChangeListener((buttonView, isChecked) -> backupInfo.setSelected(isChecked));
 
-            btnOptions.setOnClickListener(v -> {
-                PopupMenu popup = new PopupMenu(context, btnOptions);
-                popup.getMenuInflater().inflate(R.menu.backup_options_menu, popup.getMenu());
-                
-                popup.setOnMenuItemClickListener(item -> {
-                    int id = item.getItemId();
-                    if (id == R.id.menu_backup_install) {
-                        listener.onInstall(backupInfo);
-                        return true;
-                    } else if (id == R.id.menu_backup_share) {
-                        listener.onShare(backupInfo);
-                        return true;
-                    } else if (id == R.id.menu_backup_delete) {
-                        listener.onDelete(backupInfo);
-                        return true;
-                    } else if (id == R.id.menu_backup_details) {
-                        listener.onViewDetails(backupInfo);
-                        return true;
-                    }
-                    return false;
-                });
-                popup.show();
-            });
+            btnInfo.setOnClickListener(v -> listener.onViewDetails(backupInfo));
         }
     }
 }

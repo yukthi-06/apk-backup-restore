@@ -7,6 +7,7 @@ import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -23,6 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.vypeensoft.apkbackuprestore.R;
+import com.vypeensoft.apkbackuprestore.activities.MainActivity;
 import com.vypeensoft.apkbackuprestore.adapters.BackupListAdapter;
 import com.vypeensoft.apkbackuprestore.models.BackupInfo;
 import com.vypeensoft.apkbackuprestore.utils.ApkRestoreManager;
@@ -33,7 +35,9 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -48,6 +52,7 @@ public class BackupsFragment extends Fragment implements BackupListAdapter.Backu
     
     private ApkRestoreManager restoreManager;
     private ExecutorService shareExecutor;
+    private List<BackupInfo> installQueue;
 
     @Nullable
     @Override
@@ -61,6 +66,18 @@ public class BackupsFragment extends Fragment implements BackupListAdapter.Backu
 
         SearchView searchView = view.findViewById(R.id.search_view);
         ImageButton btnSort = view.findViewById(R.id.btn_sort);
+
+        Button btnBatchInstall = view.findViewById(R.id.btn_batch_install);
+        Button btnBatchDelete = view.findViewById(R.id.btn_batch_delete);
+        Button btnGoBack = view.findViewById(R.id.btn_go_back);
+
+        btnBatchInstall.setOnClickListener(v -> performBatchInstall());
+        btnBatchDelete.setOnClickListener(v -> performBatchDelete());
+        btnGoBack.setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).showInstalledFragment();
+            }
+        });
 
         restoreManager = new ApkRestoreManager(requireContext());
         shareExecutor = Executors.newSingleThreadExecutor();
@@ -108,7 +125,12 @@ public class BackupsFragment extends Fragment implements BackupListAdapter.Backu
     @Override
     public void onResume() {
         super.onResume();
-        viewModel.loadBackups();
+        if (installQueue != null && !installQueue.isEmpty()) {
+            installQueue.remove(0);
+            processNextInstall();
+        } else {
+            viewModel.loadBackups();
+        }
     }
 
     private void showSortDialog() {
@@ -267,6 +289,106 @@ public class BackupsFragment extends Fragment implements BackupListAdapter.Backu
                 .setTitle("Backup Details")
                 .setMessage(details.toString())
                 .setPositiveButton("OK", null)
+                .show();
+    }
+
+    private void performBatchInstall() {
+        List<BackupInfo> backups = viewModel.getBackupApps().getValue();
+        if (backups == null) return;
+        List<BackupInfo> selected = new ArrayList<>();
+        for (BackupInfo b : backups) {
+            if (b.isSelected()) {
+                selected.add(b);
+            }
+        }
+        if (selected.isEmpty()) {
+            Toast.makeText(getContext(), "No backups selected.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        installQueue = selected;
+        processNextInstall();
+    }
+
+    private void processNextInstall() {
+        if (installQueue == null || installQueue.isEmpty()) {
+            Toast.makeText(getContext(), "Installation queue finished.", Toast.LENGTH_SHORT).show();
+            installQueue = null;
+            viewModel.loadBackups();
+            return;
+        }
+        BackupInfo backupInfo = installQueue.get(0);
+        
+        AlertDialog progressDialog = new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Preparing Installation")
+                .setMessage("Extracting " + backupInfo.getAppName() + "...")
+                .setCancelable(false)
+                .create();
+
+        restoreManager.installApk(backupInfo, new ApkRestoreManager.InstallListener() {
+            @Override
+            public void onStart() {
+                requireActivity().runOnUiThread(progressDialog::show);
+            }
+
+            @Override
+            public void onPermissionRequired() {
+                requireActivity().runOnUiThread(() -> {
+                    if (progressDialog.isShowing()) progressDialog.dismiss();
+                    showInstallPermissionDialog();
+                });
+            }
+
+            @Override
+            public void onSuccess() {
+                requireActivity().runOnUiThread(() -> {
+                    if (progressDialog.isShowing()) progressDialog.dismiss();
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                requireActivity().runOnUiThread(() -> {
+                    if (progressDialog.isShowing()) progressDialog.dismiss();
+                    Toast.makeText(getContext(), "Error: " + message, Toast.LENGTH_LONG).show();
+                });
+            }
+        });
+    }
+
+    private void performBatchDelete() {
+        List<BackupInfo> backups = viewModel.getBackupApps().getValue();
+        if (backups == null) return;
+        List<BackupInfo> selected = new ArrayList<>();
+        for (BackupInfo b : backups) {
+            if (b.isSelected()) {
+                selected.add(b);
+            }
+        }
+        if (selected.isEmpty()) {
+            Toast.makeText(getContext(), "No backups selected.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Delete Selected Backups?")
+                .setMessage("Are you sure you want to permanently delete " + selected.size() + " selected backup files?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    int deletedCount = 0;
+                    for (BackupInfo b : selected) {
+                        try {
+                            DocumentFile file = DocumentFile.fromSingleUri(requireContext(), b.getFileUri());
+                            if (file != null && file.exists()) {
+                                file.delete();
+                                deletedCount++;
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    Toast.makeText(getContext(), "Deleted " + deletedCount + " backups.", Toast.LENGTH_SHORT).show();
+                    viewModel.loadBackups();
+                })
+                .setNegativeButton("Cancel", null)
                 .show();
     }
 
