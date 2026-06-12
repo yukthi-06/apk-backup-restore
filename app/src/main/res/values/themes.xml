@@ -40,10 +40,10 @@
     </style>
 
     <!-- Theme overlay for Material Alert Dialog to ensure white background and black text -->
-    <style name="CustomAlertDialogTheme" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+    <style name="CustomAlertDialogTheme" parent="ThemeOverlay.Material3.Light.MaterialAlertDialog">
         <item name="colorSurface">@android:color/white</item>
         <item name="colorOnSurface">@android:color/black</item>
-        <item name="colorOnSurfaceVariant">@android:color/black</item>
+        <item name="colorOnSurfaceVariant">#4A4A4A</item>
         <item name="android:textColorPrimary">@android:color/black</item>
         <item name="colorPrimary">@color/primary</item>
     </style>
