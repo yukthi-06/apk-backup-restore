@@ -307,6 +307,8 @@ public class BackupsFragment extends Fragment implements BackupListAdapter.Backu
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Backup Details")
                 .setMessage(details.toString())
+                .setPositiveButton("OK", null)
+                .show();
     }
 
     private void performBatchInstall() {
