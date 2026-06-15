@@ -73,6 +73,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_margin="4dp"
+            app:cornerRadius="8dp"
             android:text="Install" />
 
         <Button
@@ -83,6 +84,7 @@
             android:layout_weight="1"
             android:layout_margin="4dp"
             android:textColor="@color/error"
+            app:cornerRadius="8dp"
             android:text="Delete" />
 
         <Button
@@ -92,6 +94,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_margin="4dp"
+            app:cornerRadius="8dp"
             android:text="Back" />
     </LinearLayout>
 
