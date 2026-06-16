@@ -74,6 +74,13 @@
             android:layout_weight="1"
             android:layout_margin="4dp"
             app:cornerRadius="8dp"
+            android:paddingHorizontal="4dp"
+            android:paddingVertical="8dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minHeight="36dp"
+            android:textSize="12sp"
+            android:maxLines="1"
             android:text="Install" />
 
         <Button
@@ -85,6 +92,13 @@
             android:layout_margin="4dp"
             android:textColor="@color/error"
             app:cornerRadius="8dp"
+            android:paddingHorizontal="4dp"
+            android:paddingVertical="8dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minHeight="36dp"
+            android:textSize="12sp"
+            android:maxLines="1"
             android:text="Delete" />
 
         <Button
@@ -95,6 +109,13 @@
             android:layout_weight="1"
             android:layout_margin="4dp"
             app:cornerRadius="8dp"
+            android:paddingHorizontal="4dp"
+            android:paddingVertical="8dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minHeight="36dp"
+            android:textSize="12sp"
+            android:maxLines="1"
             android:text="Back" />
     </LinearLayout>
 
