@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "APK Backup & Restore"
+rootProject.name = "APK_Backup_And_Restore"
 include ':app'
