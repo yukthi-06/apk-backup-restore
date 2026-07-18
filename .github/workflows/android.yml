@@ -62,7 +62,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: APK-Backup-Restore-${{ env.BUILD_TIMESTAMP }}
-          path: app/build/outputs/apk/debug/APK-Backup-Restore-${{ env.BUILD_TIMESTAMP }}.apk
+          path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error    # fail loudly if APK is missing
 
       # ── Write job summary ───────────────────────────────────────────────────
