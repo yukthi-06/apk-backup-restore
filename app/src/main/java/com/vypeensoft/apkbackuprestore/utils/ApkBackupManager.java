@@ -35,7 +35,8 @@ public class ApkBackupManager {
         // Replace illegal filename characters
         String name = appInfo.getAppName().replaceAll("[\\\\/:*?\"<>|]", "_");
         String version = appInfo.getVersionName().replaceAll("[\\\\/:*?\"<>|]", "_");
-        return name + "_" + version + ".apk";
+        String packageName = appInfo.getPackageName().replaceAll("[\\\\/:*?\"<>|]", "_");
+        return name + "_(" + packageName + ")_" + version + ".apk";
     }
 
     /**
